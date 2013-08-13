@@ -1,6 +1,15 @@
+
 function load_nodes(data, cb) {
+  // determine bounding box from hash
+  var hash = window.location.hash;
+  var bbox = null;
+  var url = 'http://api.openwifimap.net/view_nodes_spatial';
+  if (hash.search(/#bbox=/)!=-1) {
+    url += '?bbox=' + hash.replace(/#bbox=/, "");
+  }
+
+
   var graph = new SimpleGraph();
-  var url = 'http://api.openwifimap.net/view_nodes_spatial?bbox=13.179473876953125,52.45308034523523,13.647079467773438,52.59241215943279'
   d3.json(url, function(json) {
     var data = json.rows;
     for (var i=0; i < data.length; ++i) {
