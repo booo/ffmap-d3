@@ -1,24 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
   <head>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title>Freifunk Lübeck - Knotengraph</title>
-    <link href='style.css' rel='stylesheet' type='text/css' />
-    <link href='force.css' rel='stylesheet' type='text/css' />
-    <link href='force-big.css' rel='alternate stylesheet' type='text/css' title='big'/>
-    <link href='force-light.css' rel='stylesheet' type='text/css' title='light'/>
-    <script src="html5slider.js"></script>
+    <title>Freifunk Berlin - Knotengraph</title>
+    <link href='css/style.css' rel='stylesheet' type='text/css' />
+    <link href='css/force.css' rel='stylesheet' type='text/css' />
+    <link href='css/force-light.css' rel='stylesheet' type='text/css' title='light'/>
+    <title>Freifunk Berlin</title>
   </head>
   <body>
-    <header>
-      <h1><a href="https://luebeck.freifunk.net">luebeck.freifunk.net</a></h1>
-      <ul>
-        <li><a href="nodes.html">Graph</a></li>
-        <li><a href="geomap.html">Karte</a></li>
-        <li><a href="list.html">Liste</a></li>
-      </ul>
-    </header>
     <div id="content">
       <div id="container">
         <div id="chart">
@@ -32,6 +24,7 @@
                 </svg>
                 <label>Knoten</label>
               </li>
+              <!--
               <li><svg width=30 height=20>
                   <circle cx=15 cy=10 r=8 class="node"/>
                   <g class="label">
@@ -50,12 +43,13 @@
                 </svg>
                 <label>Client</label>
               </li>
+              -->
               <li><svg width=30 height=20 class="link">
                   <line x1="2" y1="10" x2="28" y2="10"/>
                 </svg>
                 <label>Link</label>
               </li>
-
+              <!--
               <li><svg width=30 height=20 class="link vpn">
                   <line x1="2" y1="10" x2="28" y2="10"/>
                 </svg>
@@ -85,6 +79,7 @@
                   </g>
                 </svg>
                 <label>Anzahl VPN-Links</label>
+                -->
               </li>
             </ul>
           </div>
@@ -92,11 +87,15 @@
       </div>
     </div>
     <footer>
-    <a href="http://tcatm.github.com/ffmap-d3/">ffmap-d3</a> — © Nils Schneider</a>
+      based on <a href="http://tcatm.github.com/ffmap-d3/">ffmap-d3</a>
+      by Nils Schneider
     </footer>
-    <script>
-      var nodes_json = "nodes.json"
-    </script>
-    <script src='nodes_compiled.js' type='text/javascript'></script>
   </body>
+
+  <script src="lib/simplegraph.js"></script>
+  <script src="lib/d3.min.js"></script>
+  <script src="lib/date.js"></script>
+  <script src="js/loader.js"></script>
+  <script src="js/links.js"></script>
+  <script src="js/nodes.js"></script>
 </html>

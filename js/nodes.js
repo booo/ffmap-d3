@@ -1,33 +1,3 @@
-var style;
-
-function switch_style(s) {
-  var el = document.getElementsByTagName("link")
-  for (var i = 0; i < el.length; i++ ) {
-    if (el[i].getAttribute("rel").indexOf("style") != -1
-        && el[i].getAttribute("title")) {
-          /* always set to true first to workaround Chrome bug */
-          el[i].disabled = true
-
-          if (el[i].getAttribute("title") == s)
-            el[i].disabled = false
-        }
-  }
-
-  style_btn.text(s)
-}
-
-function next_style() {
-  var s;
-  if (style !== undefined)
-    s = d3.select("head link[title=" + style + "] + link")
-
-  if (s == null || s[0][0] == null)
-    s = d3.select("head link[title]")
-
-  style = s[0][0].getAttribute("title")
-  switch_style(style)
-}
-
 window.onresize = resize
 
 function resize() {
@@ -40,130 +10,30 @@ function resize() {
     force.size([w, h]).start()
 }
 
-var cp = d3.select("header").append("div")
-           .attr("id", "controlpanel")
 
-var updated_at = cp.append("p")
-
-cp.append("button")
-    .attr("class", "btn")
-    .attr("value", "reload")
-    .text("Aktualisieren")
-    .on("click", reload)
-
-var style_btn = cp.append("button")
-                  .attr("class", "btn")
-                  .attr("value", "reload")
-                  .text("Farbwechsler")
-                  .on("click", next_style)
-
-cp.append("button")
-  .attr("class", "btn")
-  .attr("value", "reload")
-  .on("click", pacman)
-  .append("svg")
-  .attr("width", 12)
-  .attr("height", 12)
-  .append("path")
-  .attr("d", d3.svg.arc().innerRadius(0)
-       .outerRadius(5)
-       .endAngle(-Math.PI/4 + Math.PI/2 + 2*Math.PI)
-       .startAngle(Math.PI/4 + Math.PI/2))
-  .attr("fill", "#888")
-  .attr("transform", "translate(6,7)")
-
-
-var btns = cp.append("div")
-           .attr("class", "btn-group")
-
-btns.append("button")
-    .attr("class", "btn active left")
-    .attr("value", "clients")
-    .text("Clients")
-    .on("click", update_graph)
-
-btns.append("button")
-    .attr("class", "btn middle")
-    .attr("value", "vpn")
-    .text("VPN")
-    .on("click", update_graph)
-
-btns.append("button")
-    .attr("class", "btn active right")
-    .attr("value", "labels")
-    .text("Labels")
-    .on("click", update_graph)
-
+/**
+ * Sidebar
+ */
 var meshinfo = d3.select("#sidebar")
                  .insert("div", ":first-child")
+
+meshinfo.append("h2").text("Suche")
+
+meshinfo.append("input")
+  .attr("placeholder", "Knotenname")
+  .on("keyup", function(){show_node(this.value)})
+  .on("change", function(){show_node(this.value)})
+
 
 meshinfo.append("h2").text("Mesh")
 
 meshinfo.append("p")
         .attr("id", "nodecount")
 
-meshinfo.append("p")
-        .attr("id", "gatewaycount")
 
-meshinfo.append("p")
-        .attr("id", "clientcount")
-
-meshinfo.append("h3").text("Gravity")
-        .append("span").attr("id", "gravity")
-meshinfo.append("input").attr("type", "range").attr("min", "0").attr("max", "0.1").attr("step", "0.001")
-        .on("change", function(d) {
-          d3.select("span#gravity").text(this.value)
-          force.gravity(this.value)
-          force.start()
-        })
-meshinfo.append("h3").text("Friction")
-        .append("span").attr("id", "friction")
-meshinfo.append("input").attr("type", "range").attr("min", "0").attr("max", "1.0").attr("step", "0.01")
-        .on("change", function(d) {
-          d3.select("span#friction").text(this.value)
-          force.friction(this.value)
-          force.start()
-        })
-meshinfo.append("h3").text("θ")
-        .append("span").attr("id", "theta")
-meshinfo.append("input").attr("type", "range").attr("min", "0").attr("max", "1.0").attr("step", "0.01")
-        .on("change", function(d) {
-          d3.select("span#theta").text(this.value)
-          force.theta(this.value)
-          force.start()
-        })
-
-meshinfo.append("h3").text("Charge")
-        .append("span").attr("id", "charge")
-meshinfo.append("input").attr("type", "range").attr("min", "0").attr("max", "2.0").attr("step", "0.01")
-        .on("change", function(d) {
-          d3.select("span#charge").text(this.value)
-          chargeScale = this.value
-          force.start()
-        })
-
-meshinfo.append("h3").text("Distance")
-        .append("span").attr("id", "distance")
-meshinfo.append("input").attr("type", "range").attr("min", "0").attr("max", "2.0").attr("step", "0.01")
-        .on("change", function(d) {
-          d3.select("span#distance").text(this.value)
-          distScale = this.value
-          force.start()
-        })
-
-meshinfo.append("h3").text("Strength")
-        .append("span").attr("id", "strength")
-meshinfo.append("input").attr("type", "range").attr("min", "0").attr("max", "2.0").attr("step", "0.01")
-        .on("change", function(d) {
-          d3.select("span#strength").text(this.value)
-          strengthScale = this.value
-          force.start()
-        })
-
-cp.append("input")
-  .on("keyup", function(){show_node(this.value)})
-  .on("change", function(){show_node(this.value)})
-
+/**
+ * Higlight searched nodes
+ */
 function show_node(query) {
   if (query.length == 0) {
     vis.selectAll(".node").classed("marked", false)
@@ -172,8 +42,7 @@ function show_node(query) {
 
   vis.selectAll(".node")
     .classed("marked", function(d) {
-      return d.macs.indexOf(query.toLowerCase()) >= 0 ||
-             d.name.toLowerCase().indexOf(query.toLowerCase()) >= 0
+      return d.id.toLowerCase().indexOf(query.toLowerCase()) >= 0;
     })
 }
 
@@ -216,12 +85,19 @@ function goto_node(d) {
   show_node_info(d)
 }
 
-function show_node_info(d) {
+function show_node_info(node) {
   d3.selectAll("#nodeinfo").remove()
 
   nodeinfo = d3.select("#chart")
                .append("div")
                .attr("id", "nodeinfo")
+
+  nodeinfo.append("button")
+          .attr("class", "refresh")
+          .text("refresh")
+          .on("click", function() {
+            goto_node(node)
+          })
 
   nodeinfo.append("button")
           .attr("class", "close")
@@ -230,47 +106,22 @@ function show_node_info(d) {
              nodeinfo.remove()
           })
 
-  nodeinfo.append("button")
-          .attr("class", "refresh")
-          .text("refresh")
-          .on("click", function() {
-            goto_node(d)
-          })
-
   nodeinfo.append("h1")
-          .text(d.name + " / " + d.id)
+          .text(node.id)
 
-  nodeinfo.append("p")
-          .append("label")
-          .text("macs: " + d.macs)
 
-  nodeinfo.append("h2").text("VPN-Links")
+  load_node_info(node.id, function(data) {
+    var list = nodeinfo.append("dl");
 
-  nodeinfo.append("ul")
-          .selectAll("li")
-          .data(d.vpns)
-          .enter().append("li")
-                  .append("a")
-                  .on("click", goto_node)
-                  .attr("href", "#")
-                  .text(function(d) {
-                    return d.name || d.macs
-                  })
+    list.append("dt").text('Lat/Long');
+    list.append("dd").text(data.latitude + "/" + data.longitude);
 
-  nodeinfo.append("p")
-          .append("label")
-          .text("Clients: " + d.clients.length)
+    list.append("dt").text('Hardware');
+    list.append("dd").text(data.hardware);
 
-  nodeinfo.append("p")
-          .append("label")
-          .text("WLAN Verbindungen: " + d.wifilinks.length)
-
-  if (d.geo) {
-    nodeinfo.append("h2").text("Geodaten")
-
-    nodeinfo.append("p")
-            .text(d.geo)
-  }
+    list.append("dt").text('Links');
+    list.append("dd").text(data.links.length);
+  });
 }
 
 function toggle_button(button) {
@@ -350,35 +201,15 @@ var data
 var visible = {clients: true, vpn: false, labels: true}
 
 function reload() {
-  load_nodes(nodes_json, data, handler)
+  load_nodes(data, handler)
 
   function handler(json) {
     data = json
 
-    date = new Date(data.meta.timestamp)
-
-    updated_at.text(date.toString('HH:mm:ss'))
-
-    var nNodes = data.nodes.filter(function(d) {
-                   return !d.flags.client && d.flags.online
-                 }).length,
-        nGateways = data.nodes.filter(function(d) {
-                   return d.flags.gateway && d.flags.online
-                 }).length,
-        nClients = data.nodes.filter(function(d) {
-                   return d.flags.client && d.flags.online
-                 }).length
-
     d3.select("#nodecount")
-      .text(nNodes + " Knoten")
+      .text(data.nodes.length + " Knoten")
 
-    d3.select("#gatewaycount")
-      .text(nGateways + " Gateways")
-
-    d3.select("#clientcount")
-      .text("ungefähr " + (nClients - nNodes) + " Clients")
-
-    data = wilder_scheiß(data)
+    data = calculate_coordinates(data)
 
     update()
   }
@@ -392,13 +223,13 @@ function fixate_geonodes(nodes, x) {
   })
 }
 
-function wilder_scheiß(data) {
+function calculate_coordinates(data) {
   var nodes = data.nodes.filter(function(d) {
-    return d.geo !== null
+    return d.data != undefined
   })
 
-  var lat = nodes.map(function(d) { return d.geo[0] })
-  var lon = nodes.map(function(d) { return d.geo[1] })
+  var lat = nodes.map(function(d) { return d.data.latlng[0] })
+  var lon = nodes.map(function(d) { return d.data.latlng[1] })
 
   var max_lat = Math.min.apply(null, lat)
   var min_lat = Math.max.apply(null, lat)
@@ -416,8 +247,8 @@ function wilder_scheiß(data) {
     if (d.x || d.y)
       return
 
-    d.x = (d.geo[1] - min_lon) * scale_x
-    d.y = (d.geo[0] - min_lat) * scale_y
+    d.x = (d.data.latlng[1] - min_lon) * scale_x
+    d.y = (d.data.latlng[0] - min_lat) * scale_y
   })
 
   return data
@@ -453,15 +284,15 @@ function dragend() {
 function update() {
   var links = data.links
                    .filter(function (d) {
-                     if (!visible.vpn && d.type == "vpn")
-                       return false
+                     //if (!visible.vpn && d.type == "vpn")
+                     //  return false
 
-                     if (!visible.clients && (d.source.flags.client || d.target.flags.client))
-                       return false
+                     //if (!visible.clients && (d.source.flags.client || d.target.flags.client))
+                     //  return false
 
-                     // hides links to clients
-                     if (!visible.vpn && (d.source.flags.vpn || d.target.flags.vpn))
-                       return false
+                     //// hides links to clients
+                     //if (!visible.vpn && (d.source.flags.vpn || d.target.flags.vpn))
+                     //  return false
 
                      return true
                    })
@@ -530,21 +361,23 @@ function update() {
 
   link.exit().remove()
 
-  var nodes = data.nodes.filter(function (d) {
-                  if (!visible.vpn && d.flags.vpn)
-                    return false
+  //var nodes = data.nodes.filter(function (d) {
+  //                if (!visible.vpn && d.flags.vpn)
+  //                  return false
 
-                  if (!visible.clients && d.flags.client)
-                    return false
+  //                if (!visible.clients && d.flags.client)
+  //                  return false
 
-                  if (!d.flags.online)
-                    return false
+  //                if (!d.flags.online)
+  //                  return false
 
-                  return true
-                })
-                .sort(function(a, b) {
-                  return (a.flags.client?1:0) < (b.flags.client?1:0)
-                })
+  //                return true
+  //              })
+  //              .sort(function(a, b) {
+  //                return (a.flags.client?1:0) < (b.flags.client?1:0)
+  //              })
+
+  var nodes = data.nodes
 
   var node = vis.select("g.nodes")
                 .selectAll(".node")
@@ -592,15 +425,27 @@ function update() {
                     })
                     .attr("class", "label")
 
-  var geodot = labelEnter.filter(function(d) { return d.geo })
+
+/**
+ * Draw circles in nodes to visualize existence some data
+ *
+ * deativated
+ *
+  var geodot = labelEnter.filter(function(d) {
+      return !("data" in d && "latlng" in d.data);
+  });
 
   geodot.append("circle")
                 .attr("class", "dot")
                 .attr("r", 3)
 
-  var geodot = labelEnter.filter(function(d) { return !d.geo })
+  var geodot = labelEnter.filter(function(d) {
+      return "data" in d && "latlng" in d.data;
+  });
 
   geodot.selectAll(".dot").remove()
+*/
+
 
   labelEnter.append("text")
             .attr("class", "name")
@@ -610,9 +455,6 @@ function update() {
 
   label.selectAll("text.name")
       .text(function(d) {
-        if (d.name != "")
-          return d.name;
-
         return d.id;
       })
 
@@ -635,25 +477,6 @@ function update() {
     .text(function(d) { return d.name?d.name:" " })
 
   label.selectAll(".uplinks").remove()
-
-  if (!visible.vpn) {
-    var uplink_info = label.filter(function (d) {
-      return d.vpns.length > 0
-    })
-    .append("g")
-    .attr("class", "uplinks")
-
-    uplink_info.append("path")
-      .attr("d","m -2.8850049,-13.182327"
-          + "c 7.5369165,0.200772 12.1529864,-1.294922 12.3338513,-10.639456"
-          + "l 2.2140476,1.018191 -3.3137621,-5.293097 -3.2945999,5.20893 2.4339957,-0.995747"
-          + "c -0.4041883,5.76426 -1.1549641,10.561363 -10.3735326,10.701179 z")
-
-    uplink_info.append("text")
-      .attr("text-anchor", "middle")
-      .attr("y", 3 - 20)
-      .text(function (d) {return d.vpns.length})
-  }
 
   node.exit().remove()
 
@@ -695,7 +518,7 @@ var initial = 1
 
 reload()
 
-var timer = window.setInterval(reload, 30000)
+//var timer = window.setInterval(reload, 30000)
 
 function redraw() {
   vis.attr("transform",
