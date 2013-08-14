@@ -125,7 +125,7 @@ function show_node_info(node) {
     list.append("li").html("<b>Addresses</b>").append("ul").selectAll('li')
         .data([].concat.apply([], data.interfaces.map(function(d) {
           return d.ipv4Addresses.concat(d.ipv6Addresses);
-        })).sort())
+        })).filter(function(d) { return d !== undefined }).sort())
         .enter()
           .append("li")
           .text(function(d) { return d; });
