@@ -71,8 +71,16 @@ header, footer {
   position: absolute;
   background: #fff;
   border: 1px solid #ddd;
-  padding: 0.5em;
+  padding: 0.8em;
   font-family: arial, helvatica;
+}
+
+#nodeinfo ul {
+  margin-left: 10px;
+}
+
+#nodeinfo ul b {
+  margin-right: 5px;
 }
 
 #nodeinfo {
@@ -80,7 +88,7 @@ header, footer {
   left: 10px;
 }
 
-#nodeinfo button.close {
+#nodeinfo button {
   float: right;
 }
 
@@ -103,7 +111,7 @@ header, footer {
 }
 
 #nodeinfo h1 {
-  font-size: 10pt;
+  font-size: 16pt;
   margin: 0 0 0.5em;
 }
 

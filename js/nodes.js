@@ -1,5 +1,10 @@
 window.onresize = resize
 
+function capitalize(string)
+{
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 function resize() {
   var chart = document.getElementById("chart")
 
@@ -86,41 +91,53 @@ function goto_node(d) {
 }
 
 function show_node_info(node) {
-  d3.selectAll("#nodeinfo").remove()
+  d3.selectAll("#nodeinfo").remove();
 
   nodeinfo = d3.select("#chart")
                .append("div")
-               .attr("id", "nodeinfo")
-
-  nodeinfo.append("button")
-          .attr("class", "refresh")
-          .text("refresh")
-          .on("click", function() {
-            goto_node(node)
-          })
+               .attr("id", "nodeinfo");
 
   nodeinfo.append("button")
           .attr("class", "close")
           .text("x")
           .on("click", function() {
              nodeinfo.remove()
-          })
+          });
+
+  nodeinfo.append("button")
+          .attr("class", "refresh")
+          .text("refresh")
+          .on("click", function() {
+            goto_node(node)
+          });
 
   nodeinfo.append("h1")
-          .text(node.id)
-
+          .text(node.id);
 
   load_node_info(node.id, function(data) {
-    var list = nodeinfo.append("dl");
+    var list = nodeinfo.append("ul");
 
-    list.append("dt").text('Lat/Long');
-    list.append("dd").text(data.latitude + "/" + data.longitude);
+    list.append("li").html("<b>Community</b>" + capitalize(data.freifunk.community.name));
+    list.append("li").html("<b>Mail</b>" + data.freifunk.contact.mail);
+    list.append("li").html("<b>Lat/Long</b>" + data.latitude + "/" + data.longitude);
+    list.append("li").html('<b>Hardware</b>' + data.hardware);
 
-    list.append("dt").text('Hardware');
-    list.append("dd").text(data.hardware);
+    list.append("li").html("<b>Addresses</b>").append("ul").selectAll('li')
+        .data([].concat.apply([], data.interfaces.map(function(d) {
+          return d.ipv4Addresses.concat(d.ipv6Addresses);
+        })).sort())
+        .enter()
+          .append("li")
+          .text(function(d) { return d; });
 
-    list.append("dt").text('Links');
-    list.append("dd").text(data.links.length);
+    list.append("li").html("<b>Links</b>").append("ul").selectAll('li')
+        .data([].concat.apply([], data.links.map(function(d) {
+          return d.id;
+        })))
+        .enter()
+          .append("li")
+          .text(function(d) { return d; });
+
   });
 }
 
