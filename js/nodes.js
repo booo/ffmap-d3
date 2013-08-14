@@ -120,7 +120,7 @@ function show_node_info(node) {
     list.append("li").html("<b>Community</b>" + capitalize(data.freifunk.community.name));
     list.append("li").html("<b>Mail</b>" + data.freifunk.contact.mail);
     list.append("li").html("<b>Lat/Long</b>" + data.latitude + "/" + data.longitude);
-    list.append("li").html('<b>Hardware</b>' + data.hardware);
+    list.append("li").html('<b>Router</b>' + data.system.sysinfo.slice(0,2).reverse().join());
 
     list.append("li").html("<b>Addresses</b>").append("ul").selectAll('li')
         .data([].concat.apply([], data.interfaces.map(function(d) {
