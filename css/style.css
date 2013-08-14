@@ -51,6 +51,7 @@ header h1 a {
   margin: 1em;
 }
 
-input {
+#search {
   margin-bottom: 15px;
+  width: 100px;
 }

@@ -20,7 +20,7 @@ var meshinfo = d3.select("#sidebar")
 meshinfo.append("h2").text("Suche")
 
 meshinfo.append("input")
-  .attr("placeholder", "Knotenname")
+  .attr("id", "search")
   .on("keyup", function(){show_node(this.value)})
   .on("change", function(){show_node(this.value)})
 
