@@ -115,6 +115,11 @@ function show_node_info(node) {
           .text(node.id);
 
   load_node_info(node.id, function(data) {
+    if (!("script" in data && data.script == "luci-app-owm")) {
+      nodeinfo.append("p").text("Node does report via luci-app-owm");
+      return;
+    }
+
     var list = nodeinfo.append("ul");
 
     list.append("li").html("<b>Community</b>" + capitalize(data.freifunk.community.name));
