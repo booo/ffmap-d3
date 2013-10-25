@@ -29,6 +29,8 @@ meshinfo.append("h2").text("Mesh")
 
 meshinfo.append("p")
         .attr("id", "nodecount")
+meshinfo.append("p")
+        .attr("id", "edgecount")
 
 
 /**
@@ -208,6 +210,8 @@ function reload() {
 
     d3.select("#nodecount")
       .text(data.nodes.length + " Knoten")
+    d3.select("#edgecount")
+      .text(data.links.length + " Links")
 
     data = calculate_coordinates(data)
 
